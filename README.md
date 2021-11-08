@@ -1,2 +1,12 @@
-# ESP8266_DNSServerBlockAdHosts
-A DNS server on ESP8266 that can block ad servers by returning invalid IP addresses
+# esp8266-block-hosts-by-dns-server
+
+This is a DNS server hosted on an ESP8266 board. It has a blacklist of domains, and will respond to DNS requests for domains that are in its blacklist with an invalid IP address. The project is inspired by [AdGuard](https://adguard.com/) and [Pi-hole](https://pi-hole.net/), and is based on the [DNSServer](https://github.com/esp8266/Arduino/tree/master/libraries/DNSServer) library of *ESP8266 core for Arduino*. It also has some parts based on the [WiFi](https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFi) library by *Espressif Systems*.
+
+I made some changes to the code of the [DNSServer](https://github.com/esp8266/Arduino/tree/master/libraries/DNSServer) library so that it can support multiple specified domains, which is in the file *DomainsList.h*. Besides, I divided the project into two parts that can be used under two different circumstances:
+
+- In the first circumstance, as a DNS proxy, if the requested domain is not in the blacklist, the ESP8266 will make a DNS request to the pre-configured external DNS servers (i.e. Google Public DNS, OpenDNS, ...), take the result from those servers and return the result to the client.
+- In the second circumstance, if the requested domain is not in the blacklist, the ESP8266 will return an error to the client, so that the client can make an another DNS request to its secondary DNS servers.
+
+Though this project can brought about a cheap device that can help to block the annoying hosts that we do not want anyone in our network to access, there might be something to keep in mind when implementing it. If the ESP8266 plays this role in a network with too many devices, this can result in an overloaded ESP8266. Once the DNS server on the board is inaccessible, clients can turn to secondary DNS servers and request for the blacklisted hosts, in which the blocking does no longer work. An another thing is that the project still uses String (which uses more memory), and due to the memory limitations of the ESP8266, not so many domains can be inserted into the blacklist in the file *DomainsList.h*. On a NodeMCU board that I tested, I could put at most about 500 domains into the blacklist.
+
+As my level is still quite low, some parts of this project might have not been fully optimized yet. Therefore, I sincerely apologize for any inconvenience you might experience while viewing or using this project. And most of all, I would really appreciate if you are still reading these words, and hope you have a good day, wherever you are.
